@@ -150,7 +150,8 @@ object SampleData {
 private fun MessageCard(msg: Message, i: Int) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
     val surfaceColor: Color by animateColorAsState(
-        targetValue = if (isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+        targetValue = if (isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+        label = "surfaceColor"
     )
     Row(
         modifier = Modifier.padding(8.dp)
@@ -231,10 +232,12 @@ private fun Conversation(message: List<Message>) {
 private fun MainScreen() {
     var inputting by rememberSaveable { mutableStateOf(false) }
     val animatedFabScale by animateFloatAsState(
-        if (inputting) 0f else 1f
+        targetValue = if (inputting) 0f else 1f,
+        label = "animatedFabScale"
     )
     val animatedInputScale by animateFloatAsState(
-        if (inputting) 1f else 0f
+        targetValue = if (inputting) 1f else 0f,
+        label = "animatedInputScale"
     )
     Scaffold(
         floatingActionButton = {
@@ -247,7 +250,11 @@ private fun MainScreen() {
                 Icon(Icons.Filled.Add, "添加")
             }
         }) {
-        Box(Modifier.fillMaxSize()) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
             Conversation(SampleData.conversationSample)
             Row(
                 Modifier
