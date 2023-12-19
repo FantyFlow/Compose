@@ -1,7 +1,7 @@
 package com.example.compose
 
 import android.animation.ObjectAnimator
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnticipateInterpolator
@@ -42,31 +42,32 @@ import com.example.compose.ui.theme.ComposeTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        installSplashScreen().apply {
-            setOnExitAnimationListener { splashScreen ->
-                ObjectAnimator.ofFloat(
-                    splashScreen.iconView,
-                    View.TRANSLATION_Y,
-                    0f,
-                    -splashScreen.view.height.toFloat()
-                ).apply {
-                    interpolator = AnticipateInterpolator()
-                    duration = 500L
-                    doOnEnd {
-                        splashScreen.remove()
-                    }
-                    Toast.makeText(this@MainActivity, "点击进入应用", Toast.LENGTH_SHORT).show()
-                    splashScreen.view.setOnClickListener {
-                        start()
-                    }
+        splashScreen.setOnExitAnimationListener { splashScreenView ->
+            ObjectAnimator.ofFloat(
+                splashScreenView.iconView,
+                View.TRANSLATION_Y,
+                0f,
+                -splashScreenView.view.height.toFloat()
+            ).apply {
+                interpolator = AnticipateInterpolator()
+                duration = 500L
+                doOnEnd {
+                    splashScreenView.remove()
+                }
+                Toast.makeText(this@MainActivity, "点击进入应用", Toast.LENGTH_SHORT).show()
+                splashScreenView.view.setOnClickListener {
+                    start()
                 }
             }
         }
         setContent {
-            ComposeTheme(false) {
+            ComposeTheme {
                 // A surface container using the 'background' color from the theme
-                MainScreen()
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    MainScreen()
+                }
             }
         }
     }
@@ -227,7 +228,6 @@ private fun Conversation(message: List<Message>) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScreen() {
     var inputting by rememberSaveable { mutableStateOf(false) }
@@ -277,16 +277,16 @@ private fun MainScreen() {
 }
 
 @Preview(
-    showBackground = false,
+    showBackground = true,
     name = "Light Mode"
 )
 @Preview(
     showBackground = true,
-    uiMode = UI_MODE_NIGHT_YES,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "Dark Mode"
 )
 @Composable
-private fun DefaultPreview() {
+fun GreetingPreview() {
     ComposeTheme {
         MainScreen()
     }
